@@ -33,6 +33,8 @@ const quizData = [
 
 let questions = [...quizData].sort(() => Math.random() - 0.5);
 let currentQuestion = 0;
+let timer;
+let timeLeft;
 
 const questionElement = document.getElementById("question");
 const optionsElement = document.getElementById("options");
@@ -41,6 +43,10 @@ const timerElement = document.getElementById("timer");
 const resultElement = document.getElementById("result");
 
 function loadQuestion() {
+    clearInterval(timer);
+    timeLeft = 15;
+    updateTimer();
+    timer = setInterval(countdown, 1000);
     const q = questions[currentQuestion];
     questionElement.textContent = `Q${currentQuestion + 1}. ${q.question}`;
     optionsElement.innerHTML = "";
@@ -54,6 +60,15 @@ function loadQuestion() {
     });
 
     nextBtn.style.display = "none";
+}
+
+function countdown() {
+    timeLeft--;
+    updateTimer();
+    if(timeLeft === 0) {
+        clearInterval(timer);
+        selectAnswer(questions[currentQuestion]?.correct);
+    }
 }
 
 function selectAnswer(index){
