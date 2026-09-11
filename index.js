@@ -43,6 +43,7 @@ const resultElement = document.getElementById("result");
 function loadQuestion() {
     const q = questions[currentQuestion];
     questionElement.textContent = `Q${currentQuestion + 1}. ${q.question}`;
+    optionsElement.innerHTML = "";
 
     q.options.forEach((option, index) => {
         const btn = document.createElement("button");
@@ -57,7 +58,50 @@ function loadQuestion() {
 
 function selectAnswer(index){
     const q = questions[currentQuestions];
+    const buttons = document.querySelectorAll(".option-btn");
 
+    buttons.forEach( btn => btn.disabled = true);
+
+    if(index === q.correct) {
+        score++;
+        buttons[index].classList.add("correct");
+    
+    } else {
+        buttons[index].classList.add("incorrect");
+        buttons[q.correct].classList.add("correct");
+
+     nextBtn.style.display = "inline-block";
+    }
+
+    nextBtn.addEventListener("click", () => {
+        currentQuestion++;
+
+        if(currentQuestion < question.length) {
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    })
+
+    function showResult() {
+        nextBtn.style.display = "none";
+        const highScore = localStorage.getItem("quizHighScore") || 0;
+
+        const isNew = score > highScore;
+
+        if(isNew) {
+            localStorage.setItem("quizHighScore", score);
+        }
+
+        resultElement.innerHTML = `
+        <h2>Hurray!!! Quiz Completed</h2>
+        <p>You have scored ${score} out of ${questions.length}</p>
+        <p>Highest score: ${Math.max(score, highScore)}</p>
+        ${isNew ? `<p>Hey, New High Score!</p>` : ""}
+        <button onclick="location.reload()">Restart</button>
+        `
+    }
 }
+
 
 loadQuestion();
